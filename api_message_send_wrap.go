@@ -1,18 +1,3 @@
-/**
- * Copyright 2022 chyroc
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package lark
 
 import (
@@ -26,16 +11,13 @@ import (
 	"time"
 )
 
-// MessageSendAPI ...
 type MessageSendAPI struct {
 	cli           *Lark
 	msgAPI        *MessageService
 	receiveID     string
 	receiveIDType IDType
-	uuid          *string
 }
 
-// Send ...
 func (r *MessageService) Send() *MessageSendAPI {
 	return &MessageSendAPI{
 		cli:    r.cli,
@@ -43,40 +25,28 @@ func (r *MessageService) Send() *MessageSendAPI {
 	}
 }
 
-// ToUserID ...
 func (r *MessageSendAPI) ToUserID(id string) *MessageSendAPI {
 	return r.to(id, IDTypeUserID)
 }
 
-// ToUnionID ...
 func (r *MessageSendAPI) ToUnionID(id string) *MessageSendAPI {
 	return r.to(id, IDTypeUnionID)
 }
 
-// ToOpenID ...
 func (r *MessageSendAPI) ToOpenID(id string) *MessageSendAPI {
 	return r.to(id, IDTypeOpenID)
 }
 
-// ToAppID ...
 func (r *MessageSendAPI) ToAppID(id string) *MessageSendAPI {
 	return r.to(id, IDTypeAppID)
 }
 
-// ToChatID ...
 func (r *MessageSendAPI) ToChatID(id string) *MessageSendAPI {
 	return r.to(id, IDTypeChatID)
 }
 
-// ToEmail ...
 func (r *MessageSendAPI) ToEmail(id string) *MessageSendAPI {
 	return r.to(id, IDTypeEmail)
-}
-
-// UUID ...
-func (r *MessageSendAPI) UUID(uuid string) *MessageSendAPI {
-	r.uuid = &uuid
-	return r
 }
 
 func (r *MessageSendAPI) to(receiveID string, receiveIDType IDType) *MessageSendAPI {
@@ -85,17 +55,14 @@ func (r *MessageSendAPI) to(receiveID string, receiveIDType IDType) *MessageSend
 	return r
 }
 
-// SendText ...
 func (r *MessageSendAPI) SendText(ctx context.Context, text string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeText, `{"text":%q}`, text)
 }
 
-// SendImage ...
 func (r *MessageSendAPI) SendImage(ctx context.Context, imageKey string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeImage, `{"image_key":%q}`, imageKey)
 }
 
-// SendPost ...
 func (r *MessageSendAPI) SendPost(ctx context.Context, post string) (*SendRawMessageResp, *Response, error) {
 	if r.cli.customBotWebHookURL != "" {
 		vv := map[string]interface{}{}
@@ -113,7 +80,6 @@ func (r *MessageSendAPI) SendPost(ctx context.Context, post string) (*SendRawMes
 	return r.send(ctx, MsgTypePost, post)
 }
 
-// SendCard ...
 func (r *MessageSendAPI) SendCard(ctx context.Context, card string) (*SendRawMessageResp, *Response, error) {
 	if r.cli.customBotWebHookURL != "" {
 		vv := map[string]interface{}{}
@@ -128,7 +94,6 @@ func (r *MessageSendAPI) SendCard(ctx context.Context, card string) (*SendRawMes
 	return r.send(ctx, MsgTypeInteractive, card)
 }
 
-// SendShareChat ...
 func (r *MessageSendAPI) SendShareChat(ctx context.Context, chatID string) (*SendRawMessageResp, *Response, error) {
 	if r.cli.customBotWebHookURL != "" {
 		return r.send(ctx, MsgTypeShareChat, `{"share_chat_id":%q}`, chatID)
@@ -136,40 +101,32 @@ func (r *MessageSendAPI) SendShareChat(ctx context.Context, chatID string) (*Sen
 	return r.send(ctx, MsgTypeShareChat, `{"chat_id":%q}`, chatID)
 }
 
-// SendShareUser ...
 func (r *MessageSendAPI) SendShareUser(ctx context.Context, userID string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeShareUser, `{"user_id":%q}`, userID)
 }
 
-// SendAudio ...
 func (r *MessageSendAPI) SendAudio(ctx context.Context, fileKey string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeAudio, `{"file_key":%q}`, fileKey)
 }
 
-// SendMedia ...
 func (r *MessageSendAPI) SendMedia(ctx context.Context, imageKey, fileKey string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeMedia, `{"image_key":%q,"file_key":%q}`, imageKey, fileKey)
 }
 
-// SendFile ...
 func (r *MessageSendAPI) SendFile(ctx context.Context, fileKey string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeFile, `{"file_key":%q}`, fileKey)
 }
 
-// SendSticker ...
 func (r *MessageSendAPI) SendSticker(ctx context.Context, fileKey string) (*SendRawMessageResp, *Response, error) {
 	return r.send(ctx, MsgTypeSticker, `{"file_key":%q}`, fileKey)
 }
 
-// MessageReplyAPI ...
 type MessageReplyAPI struct {
 	cli       *Lark
 	msgAPI    *MessageService
 	messageID string
-	uuid      *string
 }
 
-// Reply ...
 func (r *MessageService) Reply(messageID string) *MessageReplyAPI {
 	return &MessageReplyAPI{
 		cli:       r.cli,
@@ -178,58 +135,42 @@ func (r *MessageService) Reply(messageID string) *MessageReplyAPI {
 	}
 }
 
-// UUID ...
-func (r *MessageReplyAPI) UUID(uuid string) *MessageReplyAPI {
-	r.uuid = &uuid
-	return r
-}
-
-// SendText ...
 func (r *MessageReplyAPI) SendText(ctx context.Context, text string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeText, `{"text":%q}`, text)
 }
 
-// SendImage ...
 func (r *MessageReplyAPI) SendImage(ctx context.Context, imageKey string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeImage, `{"image_key":%q}`, imageKey)
 }
 
-// SendPost ...
 func (r *MessageReplyAPI) SendPost(ctx context.Context, card string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypePost, card)
 }
 
-// SendCard ...
 func (r *MessageReplyAPI) SendCard(ctx context.Context, card string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeInteractive, card)
 }
 
-// SendShareChat ...
 func (r *MessageReplyAPI) SendShareChat(ctx context.Context, chatID string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeShareChat, `{"chat_id":%q}`, chatID)
 }
 
-// SendShareUser ...
 func (r *MessageReplyAPI) SendShareUser(ctx context.Context, userID string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeShareUser, `{"user_id":%q}`, userID)
 }
 
-// SendAudio ...
 func (r *MessageReplyAPI) SendAudio(ctx context.Context, fileKey string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeAudio, `{"file_key":%q}`, fileKey)
 }
 
-// SendMedia ...
 func (r *MessageReplyAPI) SendMedia(ctx context.Context, imageKey, fileKey string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeMedia, `{"image_key":%q,"file_key":%q}`, imageKey, fileKey)
 }
 
-// SendFile ...
 func (r *MessageReplyAPI) SendFile(ctx context.Context, fileKey string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeFile, `{"file_key":%q}`, fileKey)
 }
 
-// SendSticker ...
 func (r *MessageReplyAPI) SendSticker(ctx context.Context, fileKey string) (*ReplyRawMessageResp, *Response, error) {
 	return r.reply(ctx, MsgTypeSticker, `{"file_key":%q}`, fileKey)
 }
@@ -238,24 +179,22 @@ func (r *MessageSendAPI) send(ctx context.Context, msgType MsgType, format strin
 	if r.cli.customBotWebHookURL != "" {
 		return r.msgAPI.sendCustomBotMessage(ctx, &sendCustomBotMessageReq{
 			MsgType: msgType,
-			Content: formatString(format, args...),
+			Content: fmt.Sprintf(format, args...),
 		})
 	}
 	return r.msgAPI.SendRawMessage(ctx, &SendRawMessageReq{
 		ReceiveIDType: r.receiveIDType,
 		ReceiveID:     r.receiveID,
-		Content:       formatString(format, args...),
+		Content:       fmt.Sprintf(format, args...),
 		MsgType:       msgType,
-		UUID:          r.uuid,
 	})
 }
 
 func (r *MessageReplyAPI) reply(ctx context.Context, msgType MsgType, format string, args ...interface{}) (*ReplyRawMessageResp, *Response, error) {
 	return r.msgAPI.ReplyRawMessage(ctx, &ReplyRawMessageReq{
 		MessageID: r.messageID,
-		Content:   formatString(format, args...),
+		Content:   fmt.Sprintf(format, args...),
 		MsgType:   msgType,
-		UUID:      r.uuid,
 	})
 }
 
@@ -301,11 +240,4 @@ func generateCustomBotMessageSign(secret string, timestamp string) (string, erro
 	}
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 	return signature, nil
-}
-
-func formatString(format string, args ...interface{}) string {
-	if len(args) == 0 {
-		return format
-	}
-	return fmt.Sprintf(format, args...)
 }

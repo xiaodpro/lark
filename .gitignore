@@ -28,7 +28,3 @@ venv/
 .github/all-api.json
 generate
 test/debug_test.go
-g
-release
-test.log
-debug/

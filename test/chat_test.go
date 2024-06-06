@@ -1,18 +1,3 @@
-/**
- * Copyright 2022 chyroc
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package test
 
 import (
@@ -22,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chyroc/go-ptr"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chyroc/lark"
@@ -120,14 +106,14 @@ func Test_GetChat(t *testing.T) {
 		as.Nil(err)
 		as.NotNil(resp)
 		as.Contains(resp.Name, "lark-sdk")
-		as.Equal(lark.ChatModeGroup, resp.ChatMode)
+		as.Equal("group", resp.ChatMode)
 		as.Equal(lark.ChatTypePrivate, resp.ChatType)
 	})
 
 	t.Run("", func(t *testing.T) {
 		resp, _, err := AppAllPermission.Ins().Chat.UpdateChat(ctx, &lark.UpdateChatReq{
 			ChatID: ChatContainALLPermissionApp.ChatID,
-			Name:   ptrString("包含「lark-sdk」的群 " + strconv.FormatInt(randInt64(), 10)),
+			Name:   ptr.String("包含「lark-sdk」的群 " + strconv.FormatInt(randInt64(), 10)),
 		})
 		as.Nil(err)
 		as.NotNil(resp)
@@ -150,7 +136,7 @@ func Test_GetChat(t *testing.T) {
 
 	t.Run("SearchChat, success", func(t *testing.T) {
 		resp, _, err := AppAllPermission.Ins().Chat.SearchChat(ctx, &lark.SearchChatReq{
-			Query: ptrString("lark-sdk"),
+			Query: ptr.String("lark-sdk"),
 		})
 		as.Nil(err)
 		as.True(len(resp.Items) > 0)

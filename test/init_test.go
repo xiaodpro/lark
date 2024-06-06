@@ -1,18 +1,3 @@
-/**
- * Copyright 2022 chyroc
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package test
 
 import (
@@ -161,6 +146,26 @@ var File2 = File{
 	Key: os.Getenv("LARK_FILE_KEY_TEST_FILE_2_DOC"), // ./test/file_2.docx
 }
 
+type Message struct {
+	MessageID string
+	ChatID    string
+}
+
+var MessageAdminSendTextInChatContainAllPermissionApp = Message{
+	MessageID: os.Getenv("LARK_MESSAGE_ADMIN_SEND_TEST_IN_CHAT_CONTAINS_ALL_PERMISSION_APP"),
+	ChatID:    os.Getenv("LARK_CHAT_CONTAINS_APP_PERMISSION_APP_CHAT_ID"),
+}
+
+var MessageAdminSendImageInChatContainAllPermissionApp = Message{
+	MessageID: os.Getenv("LARK_MESSAGE_ADMIN_SEND_IMAGE_IN_CHAT_CONTAINS_ALL_PERMISSION_APP"),
+	ChatID:    os.Getenv("LARK_CHAT_CONTAINS_APP_PERMISSION_APP_CHAT_ID"),
+}
+
+var MessageAllPermissionAppSendTextInChatContainAllPermissionApp = Message{
+	MessageID: os.Getenv("LARK_MESSAGE_ALL_PERMISSION_APP_SEND_TEXT_IN_CHAT_CONTAINS_ALL_PERMISSION_APP"),
+	ChatID:    os.Getenv("LARK_CHAT_CONTAINS_APP_PERMISSION_APP_CHAT_ID"),
+}
+
 type Approval struct {
 	Code string `json:"code"`
 }
@@ -183,6 +188,12 @@ func Test_Config(t *testing.T) {
 	as.NotEmpty(ChatForSendMessage.ChatID)
 	as.NotEmpty(File1.Key)
 	as.NotEmpty(File2.Key)
+	as.NotEmpty(MessageAdminSendTextInChatContainAllPermissionApp.ChatID)
+	as.NotEmpty(MessageAdminSendTextInChatContainAllPermissionApp.MessageID)
+	as.NotEmpty(MessageAdminSendImageInChatContainAllPermissionApp.ChatID)
+	as.NotEmpty(MessageAdminSendImageInChatContainAllPermissionApp.MessageID)
+	as.NotEmpty(MessageAllPermissionAppSendTextInChatContainAllPermissionApp.ChatID)
+	as.NotEmpty(MessageAllPermissionAppSendTextInChatContainAllPermissionApp.MessageID)
 }
 
 type fakeHTTPWriter struct {
