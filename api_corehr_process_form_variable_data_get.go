@@ -95,7 +95,7 @@
 	 ObjectValue     *GetCoreHRProcessFormVariableDataRespFieldVariableValueSubValueValueObjectValue `json:"object_value,omitempty"`     // 对象值, 包括对象 id 和对象类型
 	 UserValue       *string                                                                          `json:"user_value,omitempty"`       // 用户 id, 根据 user_type 选择对应的用户 id
 	 DepartmentValue *string                                                                          `json:"department_value,omitempty"` // 部门 id, 根据入参选择对应的部门 id
-	 RecordValue     []*GetCoreHRProcessFormVariableDataRespFieldVariableValueSubValueValueRecordValue `json:"record_value,omitempty"`     // 记录类型字段值
+	 RecordValues     []*GetCoreHRProcessFormVariableDataRespFieldVariableValueSubValueValueRecordValue `json:"record_values,omitempty"`     // 记录类型字段值
 	 EmploymentValue *string                                                                          `json:"employment_value,omitempty"` // 员工类型字段值, 为用户 id, 根据入参选择返回的用户 id
 	 ListValues      []string                                                                        `json:"list_values,omitempty"`      // 数组类型值, 里面包含多个值, 每个元素都对应 subValues 中的数组下标
  }
@@ -136,7 +136,7 @@
 	 ObjectValue     *GetCoreHRProcessFormVariableDataRespFieldVariableValueVariableValueObjectValue `json:"object_value,omitempty"`     // 对象值, 包括对象 id 和对象类型
 	 UserValue       *string                                                                          `json:"user_value,omitempty"`       // 用户 id, 根据 user_type 选择对应的用户 id
 	 DepartmentValue *string                                                                          `json:"department_value,omitempty"` // 部门 id, 根据入参选择对应的部门 id
-	 RecordValue     []*GetCoreHRProcessFormVariableDataRespFieldVariableValueVariableValueRecordValue `json:"record_value,omitempty"`     // 记录类型字段值
+	 RecordValues     []*GetCoreHRProcessFormVariableDataRespFieldVariableValueVariableValueRecordValue `json:"record_values,omitempty"`     // 记录类型字段值
 	 EmploymentValue *string                                                                          `json:"employment_value,omitempty"` // 员工类型字段值, 为用户 id, 根据入参选择返回的用户 id
 	 ListValues      []string                                                                        `json:"list_values,omitempty"`      // 数组类型值, 里面包含多个值, 每个元素都对应 subValues 中的数组下标
  }
