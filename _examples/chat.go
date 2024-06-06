@@ -1,14 +1,29 @@
+/**
+ * Copyright 2022 chyroc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package examples
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/chyroc/go-ptr"
-
 	"github.com/chyroc/lark"
+	"github.com/chyroc/lark/_examples/util"
 )
 
+// ExampleChat ...
 func ExampleChat() {
 	ctx := context.Background()
 	cli := lark.New(lark.WithAppCredential("<APP_ID>", "<APP_SECRET>"))
@@ -16,7 +31,7 @@ func ExampleChat() {
 	// create chat
 	{
 		resp, _, err := cli.Chat.CreateChat(ctx, &lark.CreateChatReq{
-			Name: ptr.String("<CHAT_NAME>"),
+			Name: util.PtrString("<CHAT_NAME>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -25,7 +40,7 @@ func ExampleChat() {
 	{
 		resp, _, err := cli.Chat.UpdateChat(ctx, &lark.UpdateChatReq{
 			ChatID: "<CHAT_ID>",
-			Name:   ptr.String("<CHAT_NAME>"),
+			Name:   util.PtrString("<CHAT_NAME>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -83,7 +98,7 @@ func ExampleChat() {
 	// search chat
 	{
 		resp, _, err := cli.Chat.SearchChat(ctx, &lark.SearchChatReq{
-			Query: ptr.String("<SEARCH>"),
+			Query: util.PtrString("<SEARCH>"),
 		})
 		fmt.Println(resp, err)
 	}

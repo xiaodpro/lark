@@ -1,14 +1,29 @@
+/**
+ * Copyright 2022 chyroc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package examples
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/chyroc/go-ptr"
-
 	"github.com/chyroc/lark"
+	"github.com/chyroc/lark/_examples/util"
 )
 
+// ExampleCalendar ...
 func ExampleCalendar() {
 	ctx := context.Background()
 	cli := lark.New(lark.WithAppCredential("<APP_ID>", "<APP_SECRET>"))
@@ -16,7 +31,7 @@ func ExampleCalendar() {
 	// create calendar
 	{
 		resp, _, err := cli.Calendar.CreateCalendar(ctx, &lark.CreateCalendarReq{
-			Summary: ptr.String("<SUMMARY>"),
+			Summary: util.PtrString("<SUMMARY>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -25,7 +40,7 @@ func ExampleCalendar() {
 	{
 		resp, _, err := cli.Calendar.UpdateCalendar(ctx, &lark.UpdateCalendarReq{
 			CalendarID: "<CALENDAR_ID>",
-			Summary:    ptr.String("<SUMMARY>"),
+			Summary:    util.PtrString("<SUMMARY>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -79,7 +94,7 @@ func ExampleCalendar() {
 	// create calendar event
 	{
 		resp, _, err := cli.Calendar.CreateCalendarEvent(ctx, &lark.CreateCalendarEventReq{
-			Summary: ptr.String("<SUMMARY>"),
+			Summary: util.PtrString("<SUMMARY>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -88,7 +103,7 @@ func ExampleCalendar() {
 	{
 		resp, _, err := cli.Calendar.UpdateCalendarEvent(ctx, &lark.UpdateCalendarEventReq{
 			CalendarID: "<CALENDAR_ID>",
-			Summary:    ptr.String("<SUMMARY>"),
+			Summary:    util.PtrString("<SUMMARY>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -172,7 +187,7 @@ func ExampleCalendar() {
 			EventID:    "<EVENT_ID>",
 			Attendees: []*lark.CreateCalendarEventAttendeeReqAttendee{
 				{
-					UserID: ptr.String("<USER_ID>"),
+					UserID: util.PtrString("<USER_ID>"),
 				},
 			},
 		})
@@ -215,7 +230,7 @@ func ExampleCalendar() {
 		resp, _, err := cli.Calendar.GetCalendarFreeBusyList(ctx, &lark.GetCalendarFreeBusyListReq{
 			TimeMin: "2020-10-28T12:00:00+08:00",
 			TimeMax: "2020-10-29T12:00:00+08:00",
-			UserID:  ptr.String("<USER_ID>"),
+			UserID:  util.PtrString("<USER_ID>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -226,7 +241,7 @@ func ExampleCalendar() {
 			UserID:    "<USER_ID>",
 			StartTime: "2021-01-01",
 			EndTime:   "2021-01-02",
-			Title:     ptr.String("<TITLE>"),
+			Title:     util.PtrString("<TITLE>"),
 		})
 		fmt.Println(resp, err)
 	}
@@ -242,7 +257,7 @@ func ExampleCalendar() {
 	// subscribe calendar acl
 	{
 		resp, _, err := cli.Calendar.GenerateCaldavConf(ctx, &lark.GenerateCaldavConfReq{
-			DeviceName: ptr.String("DEVICE_NAME"),
+			DeviceName: util.PtrString("DEVICE_NAME"),
 		})
 		fmt.Println(resp, err)
 	}

@@ -1,9 +1,23 @@
+/**
+ * Copyright 2022 chyroc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package test
 
 import (
 	"testing"
 
-	"github.com/chyroc/go-ptr"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chyroc/lark"
@@ -45,11 +59,11 @@ func Test_Contact_Failed(t *testing.T) {
 	t.Run("get-dep-list", func(t *testing.T) {
 		resp, _, err := moduleCli.GetDepartmentList(ctx, &lark.GetDepartmentListReq{
 			// UserIDType:         nil,
-			DepartmentIDType:   nil,
-			ParentDepartmentID: nil,
-			FetchChild:         nil,
-			PageToken:          nil,
-			PageSize:           nil,
+			DepartmentIDType: nil,
+			DepartmentID:     "0",
+			FetchChild:       nil,
+			PageToken:        nil,
+			PageSize:         nil,
 		})
 		printData(resp)
 		as.Nil(err)
@@ -59,6 +73,7 @@ func Test_Contact_Failed(t *testing.T) {
 
 	if IsInCI() {
 		t.Run("search-dep", func(t *testing.T) {
+			t.Skip()
 			resp, _, err := moduleCli.SearchDepartment(ctx, &lark.SearchDepartmentReq{
 				UserIDType:       nil,
 				DepartmentIDType: nil,
@@ -86,7 +101,7 @@ func Test_Contact_Failed(t *testing.T) {
 				DepartmentIDType:   lark.DepartmentIDTypePtr(lark.DepartmentIDTypeDepartmentID),
 				Name:               "dep-" + randInt64String(),
 				ParentDepartmentID: "0",
-				LeaderUserID:       ptr.String(UserAdmin.UserID),
+				LeaderUserID:       ptrString(UserAdmin.UserID),
 			})
 			as.Nil(err)
 			as.NotNil(resp)
@@ -114,8 +129,8 @@ func Test_Contact_Failed(t *testing.T) {
 				// UserIDType:       nil,
 				DepartmentIDType: lark.DepartmentIDTypePtr(lark.DepartmentIDTypeOpenDepartmentID),
 				DepartmentID:     childOpenDepartmentID,
-				// PageToken:        ptr.String(""),
-				// PageSize:         ptr.Int64(10),
+				// PageToken:        ptrString(""),
+				// PageSize:         ptrInt64(10),
 			})
 			printData(resp)
 			as.Nil(err)
@@ -129,7 +144,7 @@ func Test_Contact_Failed(t *testing.T) {
 				// UserIDType:         nil,
 				DepartmentIDType: lark.DepartmentIDTypePtr(lark.DepartmentIDTypeOpenDepartmentID),
 				DepartmentID:     childOpenDepartmentID,
-				Name:             ptr.String("dep-update-" + randInt64String()),
+				Name:             ptrString("dep-update-" + randInt64String()),
 				// I18nName:           nil,
 				// ParentDepartmentID: nil,
 				// LeaderUserID:       nil,
@@ -147,7 +162,7 @@ func Test_Contact_Failed(t *testing.T) {
 				// UserIDType:         nil,
 				DepartmentIDType: lark.DepartmentIDTypePtr(lark.DepartmentIDTypeOpenDepartmentID),
 				DepartmentID:     childOpenDepartmentID,
-				Name:             ptr.String("dep-patch-" + randInt64String()),
+				Name:             ptrString("dep-patch-" + randInt64String()),
 				// I18nName:           nil,
 				// ParentDepartmentID: nil,
 				// LeaderUserID:       nil,

@@ -1,23 +1,69 @@
+/**
+ * Copyright 2022 chyroc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package lark
 
 import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
+type SheetContentType string
+
+const (
+	SheetContentTypeString     SheetContentType = "string"
+	SheetContentTypeInt        SheetContentType = "int"
+	SheetContentTypeFloat      SheetContentType = "float"
+	SheetContentTypeLink       SheetContentType = "link"
+	SheetContentTypeAtUser     SheetContentType = "at_user"
+	SheetContentTypeFormula    SheetContentType = "formula"
+	SheetContentTypeAtDoc      SheetContentType = "at_doc"
+	SheetContentTypeMultiValue SheetContentType = "multi_value"
+	SheetContentTypeEmbedImage SheetContentType = "embed_image"
+	SheetContentTypeAttachment SheetContentType = "attachment"
+	SheetContentTypeList       SheetContentType = "list"
+	SheetContentTypeNull       SheetContentType = "null"
+)
+
+// SheetContent ...
 type SheetContent struct {
 	Children   *[]*SheetContent      `json:"children,omitempty"`
 	String     *string               `json:"string,omitempty"`      // 字符串, `"`
 	Int        *int64                `json:"int,omitempty"`         // 数字, `0-9`
+	Float      *float64              `json:"float,omitempty"`       // 小数, `x.x`
 	Link       *SheetValueLink       `json:"link,omitempty"`        // 带文本的链接, `{
 	AtUser     *SheetValueAtUser     `json:"at_user,omitempty"`     // @人, `{
 	Formula    *SheetValueFormula    `json:"formula,omitempty"`     // 公式, `{
 	AtDoc      *SheetValueAtDoc      `json:"at_doc,omitempty"`      // @文档, `{
 	MultiValue *SheetValueMultiValue `json:"multi_value,omitempty"` // 下拉列表, `{
 	EmbedImage *SheetValueEmbedImage `json:"embed_image,omitempty"` // 内嵌图片, `{
+	Attachment *SheetValueAttachment `json:"attachment,omitempty"`  // 附件, `{
 }
 
+// SheetValueAttachment ...
+type SheetValueAttachment struct {
+	FileToken string `json:"fileToken"`
+	MimeType  string `json:"mimeType"`
+	Size      int    `json:"size"`
+	Text      string `json:"text"`
+	Type      string `json:"type"` // attachment
+}
+
+// SheetValueEmbedImage ...
 type SheetValueEmbedImage struct {
 	FileToken string `json:"fileToken"`
 	Height    int    `json:"height"`
@@ -27,6 +73,7 @@ type SheetValueEmbedImage struct {
 	Width     int    `json:"width"`
 }
 
+// SheetValueLink ...
 type SheetValueLink struct {
 	Text string `json:"text"`
 	Link string `json:"link"`
@@ -62,6 +109,36 @@ type SheetValueMultiValue struct {
 	Values []interface{} `json:"values"` // values为数组，可填bool,string,number类型。string类型数据不能包含","。使用前需要先使用设置下拉列表接口设置下拉列表。
 }
 
+func (r *SheetContent) Type() SheetContentType {
+	switch {
+	case r.String != nil:
+		return SheetContentTypeString
+	case r.Int != nil:
+		return SheetContentTypeInt
+	case r.Float != nil:
+		return SheetContentTypeFloat
+	case r.Link != nil:
+		return SheetContentTypeLink
+	case r.AtUser != nil:
+		return SheetContentTypeAtUser
+	case r.Formula != nil:
+		return SheetContentTypeFormula
+	case r.AtDoc != nil:
+		return SheetContentTypeAtDoc
+	case r.MultiValue != nil:
+		return SheetContentTypeMultiValue
+	case r.EmbedImage != nil:
+		return SheetContentTypeEmbedImage
+	case r.Attachment != nil:
+		return SheetContentTypeAttachment
+	case r.Children != nil:
+		return SheetContentTypeList
+	default:
+		return SheetContentTypeNull
+	}
+}
+
+// UnmarshalJSON ...
 func (r *SheetContent) UnmarshalJSON(bytes []byte) error {
 	if len(bytes) == 0 {
 		return nil
@@ -73,18 +150,39 @@ func (r *SheetContent) UnmarshalJSON(bytes []byte) error {
 		}
 		r.String = &dest
 		return nil
-	} else if bytes[0] >= '0' && bytes[0] <= '9' {
-		var dest int64
-		if err := json.Unmarshal(bytes, &dest); err != nil {
-			return err
+	} else if (bytes[0] >= '0' && bytes[0] <= '9') ||
+		(bytes[0] == '-' && len(bytes) > 1 && bytes[1] >= '0' && bytes[1] <= '9') {
+		str := string(bytes)
+		if strings.Contains(str, ".") {
+			float, err := strconv.ParseFloat(str, 64)
+			if err != nil {
+				return err
+			}
+			r.Float = &float
+		} else {
+			integer, err := strconv.ParseInt(str, 10, 64)
+			if err != nil {
+				return err
+			}
+			r.Int = &integer
 		}
-		r.Int = &dest
 		return nil
+	} else if bytes[0] == 't' || bytes[0] == 'f' || bytes[0] == 'T' || bytes[0] == 'F' {
+		t := "true"
+		f := "false"
+		if len(bytes) == 4 && strings.ToLower(string(bytes)) == t {
+			r.String = &t
+			return nil
+		} else if len(bytes) == 5 && strings.ToLower(string(bytes)) == f {
+			r.String = &f
+			return nil
+		}
+		return fmt.Errorf("unsupport sheet bool value")
 	} else if bytes[0] == 'n' {
 		if len(bytes) == 4 && string(bytes) == "null" {
 			return nil
 		}
-		return fmt.Errorf("unsupport sheet value")
+		return fmt.Errorf("unsupport sheet null value")
 	} else if bytes[0] == '{' {
 		var obj struct {
 			Type     string `json:"type"`
@@ -94,6 +192,13 @@ func (r *SheetContent) UnmarshalJSON(bytes []byte) error {
 			return err
 		}
 		switch obj.Type {
+		case "attachment":
+			resp := new(SheetValueAttachment)
+			if err := json.Unmarshal(bytes, resp); err != nil {
+				return err
+			}
+			r.Attachment = resp
+			return nil
 		case "embed-image":
 			resp := new(SheetValueEmbedImage)
 			if err := json.Unmarshal(bytes, resp); err != nil {
@@ -160,11 +265,14 @@ func (r *SheetContent) UnmarshalJSON(bytes []byte) error {
 	}
 }
 
-func (r *SheetContent) MarshalJSON() ([]byte, error) {
+// MarshalJSON ...
+func (r SheetContent) MarshalJSON() ([]byte, error) {
 	if r.String != nil {
-		return []byte(fmt.Sprintf("%q", *r.String)), nil
+		return json.Marshal(*r.String)
 	} else if r.Int != nil {
 		return []byte(strconv.FormatInt(*r.Int, 10)), nil
+	} else if r.Float != nil {
+		return []byte(strconv.FormatFloat(*r.Float, byte('f'), 10, 64)), nil
 	} else if r.Link != nil {
 		r.Link.Type = "url"
 		return json.Marshal(r.Link)

@@ -1,23 +1,47 @@
+/**
+ * Copyright 2022 chyroc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package lark
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Request(t *testing.T) {
 	as := assert.New(t)
+	ins := &Lark{}
+	ctx := context.Background()
+
+	fmt.Println(1)
 
 	t.Run("", func(t *testing.T) {
 		type req struct {
 			ID string `path:"id"`
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com/:id",
 			Body: req{
@@ -35,7 +59,7 @@ func Test_Request(t *testing.T) {
 		type req struct {
 			ID int `path:"id"`
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com/:id",
 			Body: req{
@@ -54,7 +78,7 @@ func Test_Request(t *testing.T) {
 			Type string `path:"type"`
 			ID   int    `path:"id"`
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com/:type/:id",
 			Body: req{
@@ -74,7 +98,7 @@ func Test_Request(t *testing.T) {
 			Type string `query:"type"`
 			ID   int    `path:"id"`
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com/:id",
 			Body: req{
@@ -95,7 +119,7 @@ func Test_Request(t *testing.T) {
 			ID   int    `path:"id" json:"-"`
 			Name string `json:"name"`
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com/:id",
 			Body: req{
@@ -119,7 +143,7 @@ func Test_Request(t *testing.T) {
 			ImageType ImageType `json:"image_type,omitempty"` // 图片类型,**示例值**："message",**可选值有**：,- `message`：用于发送消息,- `avatar`：用于设置头像
 			Image     io.Reader `json:"image,omitempty"`      // 图片内容,**示例值**：二进流
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com",
 			IsFile: true,
@@ -142,7 +166,7 @@ func Test_Request(t *testing.T) {
 		type req struct {
 			Types []string `query:"types"`
 		}
-		resp, err := parseRequestParam(&RawRequestReq{
+		resp, err := ins.parseRawHttpRequest(ctx, &RawRequestReq{
 			Method: "get",
 			URL:    "http://x.com",
 			IsFile: true,
@@ -209,4 +233,40 @@ func Test_eventReq_unmarshalEvent(t *testing.T) {
 	event := new(EventV2IMMessageReceiveV1)
 	as.Nil(req.unmarshalEvent(event))
 	as.Equal("om_5ce6d572455d361153b7cb51da133945", event.Message.MessageID)
+}
+
+func Test_store(t *testing.T) {
+	as := assert.New(t)
+
+	s := NewStoreMemory()
+	key := "key"
+	ctx := context.Background()
+
+	{
+		_, _, err := s.Get(ctx, key)
+		as.NotNil(err)
+		as.True(errors.Is(err, ErrStoreNotFound))
+	}
+
+	as.Nil(s.Set(ctx, key, "val", time.Second*6))
+
+	{
+		val, _, err := s.Get(ctx, key)
+		as.Nil(err)
+		as.Equal("val", val)
+	}
+
+	// sleep 10s
+	timeNow = func() time.Time {
+		return time.Now().Add(time.Second * 10)
+	}
+	defer func() {
+		timeNow = time.Now
+	}()
+
+	{
+		_, _, err := s.Get(ctx, key)
+		as.NotNil(err)
+		as.True(errors.Is(err, ErrStoreNotFound))
+	}
 }
