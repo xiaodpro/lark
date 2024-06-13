@@ -115,7 +115,7 @@
  // GetCoreHRProcessFormVariableDataRespFieldVariableValueSubValueValueRecordValue ...
  type GetCoreHRProcessFormVariableDataRespFieldVariableValueSubValueValueRecordValue struct {
 	 VariableApiName string `json:"variable_api_name,omitempty"` // 变量唯一标识
-	 VariableValue   string `json:"variable_value,omitempty"`    // 变量值, 对应 subValues 中的 key
+	 SubValueKey   string `json:"sub_value_key,omitempty"`    // 变量值, 对应 subValues 中的 key
  }
  
  // GetCoreHRProcessFormVariableDataRespFieldVariableValueVariableName ...
